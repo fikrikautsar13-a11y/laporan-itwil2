@@ -1,205 +1,695 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>System Login & Interactive Report Dashboard</title>
+  <title>System Login & 3D Analytics Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
     * {
+      font-family: 'Inter', sans-serif;
       box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
 
     body {
-      background-color: #0b0f19;
-      color: #fff;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      background-color: #070a12;
+      color: #e2e8f0;
+      overflow-x: hidden;
       min-height: 100vh;
-      overflow: hidden;
-      position: relative;
     }
 
-    /* BACKGROUND ANIMASI LAPORAN GEGERAK */
-    .report-bg {
+    /* 3D Perspective Container */
+    .perspective-container {
+      perspective: 1200px;
+    }
+
+    /* Glassmorphism with 3D Depth */
+    .glass-card-3d {
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(0, 210, 255, 0.2);
+      box-shadow: 
+        0 25px 50px -12px rgba(0, 0, 0, 0.7),
+        0 0 30px rgba(0, 210, 255, 0.15),
+        inset 0 1px 1px rgba(255, 255, 255, 0.2);
+      transform-style: preserve-3d;
+      transition: transform 0.15s ease-out, box-shadow 0.3s ease;
+    }
+
+    .glass-card-3d:hover {
+      box-shadow: 
+        0 30px 60px -12px rgba(0, 0, 0, 0.8),
+        0 0 45px rgba(0, 210, 255, 0.3),
+        inset 0 1px 2px rgba(255, 255, 255, 0.3);
+    }
+
+    .preserve-3d {
+      transform-style: preserve-3d;
+    }
+
+    .translate-z-10 { transform: translateZ(10px); }
+    .translate-z-20 { transform: translateZ(20px); }
+    .translate-z-30 { transform: translateZ(30px); }
+
+    /* Custom Animated Glowing Grid Lines */
+    .grid-bg {
+      background-image: 
+        linear-gradient(to right, rgba(0, 210, 255, 0.05) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(0, 210, 255, 0.05) 1px, transparent 1px);
+      background-size: 40px 40px;
+      transform: perspective(500px) rotateX(60deg) translateY(-100px) scale(2);
+      animation: gridMove 20s linear infinite;
+    }
+
+    @keyframes gridMove {
+      0% { background-position: 0 0; }
+      100% { background-position: 0 400px; }
+    }
+
+    /* Neon Pulse Effect */
+    .neon-border {
+      position: relative;
+    }
+    .neon-border::after {
+      content: '';
       position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-around;
-      opacity: 0.15;
-      z-index: 1;
-      pointer-events: none;
+      inset: -1px;
+      background: linear-gradient(90deg, #00d2ff, #3a7bd5, #00d2ff);
+      border-radius: inherit;
+      z-index: -1;
+      opacity: 0.6;
+      filter: blur(4px);
+      animation: neonGlow 4s linear infinite;
     }
 
-    .chart-line {
-      width: 100%;
-      height: 80px;
-      background: linear-gradient(90deg, rgba(0, 210, 255, 0) 0%, rgba(0, 210, 255, 0.4) 50%, rgba(0, 210, 255, 0) 100%);
-      animation: pulseLine 4s infinite ease-in-out;
+    @keyframes neonGlow {
+      0%, 100% { opacity: 0.4; }
+      50% { opacity: 0.9; }
     }
 
-    .bars-container {
-      display: flex;
-      align-items: flex-end;
-      justify-content: space-around;
-      height: 250px;
-      padding: 0 50px;
+    /* Glossy 3D Button */
+    .btn-3d {
+      background: linear-gradient(135deg, #00d2ff 0%, #3a7bd5 100%);
+      box-shadow: 
+        0 4px 15px rgba(0, 210, 255, 0.4),
+        inset 0 2px 3px rgba(255, 255, 255, 0.4),
+        inset 0 -2px 3px rgba(0, 0, 0, 0.3);
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    .bar {
-      width: 30px;
-      background: linear-gradient(180deg, #00d2ff, #3a7bd5);
-      border-radius: 4px 4px 0 0;
-      animation: floatBar 3s infinite alternate ease-in-out;
+    .btn-3d:hover {
+      transform: translateY(-2px) translateZ(15px);
+      box-shadow: 
+        0 8px 25px rgba(0, 210, 255, 0.6),
+        inset 0 2px 5px rgba(255, 255, 255, 0.6),
+        inset 0 -2px 3px rgba(0, 0, 0, 0.3);
     }
 
-    /* Variasi tinggi & kecepatan animasi bar */
-    .bar:nth-child(1) { height: 40%; animation-duration: 2.2s; }
-    .bar:nth-child(2) { height: 75%; animation-duration: 3.1s; }
-    .bar:nth-child(3) { height: 50%; animation-duration: 1.8s; }
-    .bar:nth-child(4) { height: 90%; animation-duration: 2.7s; }
-    .bar:nth-child(5) { height: 30%; animation-duration: 3.5s; }
-    .bar:nth-child(6) { height: 65%; animation-duration: 2.0s; }
-    .bar:nth-child(7) { height: 85%; animation-duration: 2.9s; }
-
-    @keyframes floatBar {
-      0% { transform: scaleY(0.3); opacity: 0.4; }
-      100% { transform: scaleY(1); opacity: 1; }
+    .btn-3d:active {
+      transform: translateY(1px) translateZ(5px);
+      box-shadow: 0 2px 10px rgba(0, 210, 255, 0.3);
     }
 
-    @keyframes pulseLine {
-      0%, 100% { opacity: 0.2; transform: translateY(0); }
-      50% { opacity: 0.8; transform: translateY(-15px); }
+    /* Animated Bars in Ambient Monitor */
+    .bar-anim {
+      animation: barHeight 3s ease-in-out infinite alternate;
     }
 
-    /* KARTU LOGIN (GLASSMORPHISM) */
-    .login-card {
-      position: relative;
-      z-index: 10;
-      width: 100%;
-      max-width: 400px;
-      padding: 40px 30px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 16px;
-      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
-      backdrop-filter: blur(10px);
+    @keyframes barHeight {
+      0% { height: 25%; }
+      100% { height: 95%; }
     }
 
-    .login-header {
-      text-align: center;
-      margin-bottom: 30px;
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
     }
-
-    .login-header h2 {
-      font-size: 24px;
-      font-weight: 600;
-      letter-spacing: 1px;
-      color: #00d2ff;
+    ::-webkit-scrollbar-track {
+      background: #0b0f19;
     }
-
-    .login-header p {
-      font-size: 13px;
-      color: #a0aec0;
-      margin-top: 5px;
+    ::-webkit-scrollbar-thumb {
+      background: #1e293b;
+      border-radius: 3px;
     }
-
-    .form-group {
-      margin-bottom: 20px;
-    }
-
-    .form-group label {
-      display: block;
-      font-size: 12px;
-      color: #cbd5e0;
-      margin-bottom: 8px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .form-group input {
-      width: 100%;
-      padding: 12px 16px;
-      background: rgba(15, 23, 42, 0.6);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 8px;
-      color: #fff;
-      font-size: 14px;
-      outline: none;
-      transition: all 0.3s ease;
-    }
-
-    .form-group input:focus {
-      border-color: #00d2ff;
-      box-shadow: 0 0 8px rgba(0, 210, 255, 0.4);
-    }
-
-    .btn-login {
-      width: 100%;
-      padding: 12px;
-      background: linear-gradient(90deg, #00d2ff, #3a7bd5);
-      border: none;
-      border-radius: 8px;
-      color: #fff;
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-      margin-top: 10px;
-    }
-
-    .btn-login:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 20px rgba(0, 210, 255, 0.4);
-    }
-
-    .btn-login:active {
-      transform: translateY(0);
+    ::-webkit-scrollbar-thumb:hover {
+      background: #00d2ff;
     }
   </style>
 </head>
-<body>
+<body class="bg-[#070a12] text-slate-200 relative min-h-screen flex flex-col justify-between overflow-x-hidden selection:bg-cyan-500 selection:text-white">
 
-  <!-- Background Animasi Laporan/Grafik -->
-  <div class="report-bg">
-    <div class="chart-line"></div>
-    <div class="bars-container">
-      <div class="bar"></div>
-      <div class="bar"></div>
-      <div class="bar"></div>
-      <div class="bar"></div>
-      <div class="bar"></div>
-      <div class="bar"></div>
-      <div class="bar"></div>
-    </div>
-    <div class="chart-line"></div>
+  <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+    <!-- Animated 3D Floor Grid -->
+    <div class="absolute inset-0 grid-bg opacity-30"></div>
+    
+    <!-- Ambient Blue Light Cones -->
+    <div class="absolute -top-40 left-1/4 w-[600px] h-[600px] bg-cyan-500/10 rounded-full blur-[140px] pointer-events-none"></div>
+    <div class="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[150px] pointer-events-none"></div>
   </div>
 
-  <!-- Form Login -->
-  <div class="login-card">
-    <div class="login-header">
-      <h2>REPORT DASHBOARD</h2>
-      <p>Silakan masuk untuk melihat laporan sistem</p>
+  <header class="relative z-20 w-full px-6 py-4 border-b border-slate-800/60 bg-slate-950/40 backdrop-blur-md flex justify-between items-center">
+    <div class="flex items-center space-x-3">
+      <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/20">
+        <i class="fa-solid font-bold text-white fa-chart-line text-lg"></i>
+      </div>
+      <div>
+        <h1 class="font-bold text-lg tracking-wider text-white flex items-center gap-2">
+          SYNAPSE <span class="text-xs font-semibold px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/30">v3.8 PRO</span>
+        </h1>
+        <p class="text-xs text-slate-400">Enterprise Data Intelligence Portal</p>
+      </div>
     </div>
-    <form action="#" method="POST">
-      <div class="form-group">
-        <label for="username">Username / Email</label>
-        <input type="text" id="username" placeholder="Masukkan username Anda" required>
+
+    <!-- Live Status Pill -->
+    <div class="hidden md:flex items-center space-x-6 text-xs text-slate-400">
+      <div class="flex items-center space-x-2">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+        <span class="text-slate-300 font-medium">SERVER: LIVE</span>
       </div>
-      <div class="form-group">
-        <label for="password">Password</label>
-        <input type="password" id="password" placeholder="••••••••" required>
+      <div class="flex items-center space-x-2">
+        <i class="fa-solid fa-microchip text-cyan-400"></i>
+        <span>CPU: <strong class="text-slate-200">28%</strong></span>
       </div>
-      <button type="submit" class="btn-login">Masuk ke Sistem</button>
-    </form>
+      <div class="flex items-center space-x-2">
+        <i class="fa-solid fa-database text-blue-400"></i>
+        <span>LATENCY: <strong class="text-slate-200">12ms</strong></span>
+      </div>
+    </div>
+  </header>
+
+  <main class="relative z-10 my-auto container mx-auto px-4 py-8 flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-12 min-h-[calc(100vh-140px)]">
+
+    <!-- LEFT SIDE: Background Live Monitor Wall (Command Center Style) -->
+    <div class="w-full lg:w-7/12 flex flex-col gap-6 order-2 lg:order-1">
+      
+      <!-- Top Overview Metrics Bar -->
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+        <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl backdrop-blur-md relative overflow-hidden group hover:border-cyan-500/40 transition">
+          <div class="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition text-cyan-400 text-3xl">
+            <i class="fa-solid fa-users"></i>
+          </div>
+          <p class="text-xs text-slate-400 uppercase tracking-wider font-semibold">Active Sessions</p>
+          <h3 class="text-2xl font-extrabold text-white mt-1">14,892 <span class="text-xs font-normal text-emerald-400"><i class="fa-solid fa-arrow-up"></i> +12%</span></h3>
+          <div class="w-full bg-slate-800 h-1.5 rounded-full mt-3 overflow-hidden">
+            <div class="bg-gradient-to-r from-cyan-500 to-blue-500 h-full w-[78%]"></div>
+          </div>
+        </div>
+
+        <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl backdrop-blur-md relative overflow-hidden group hover:border-cyan-500/40 transition">
+          <div class="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition text-blue-400 text-3xl">
+            <i class="fa-solid fa-bolt"></i>
+          </div>
+          <p class="text-xs text-slate-400 uppercase tracking-wider font-semibold">Real-Time Throughput</p>
+          <h3 class="text-2xl font-extrabold text-white mt-1">98.4 <span class="text-xs text-slate-400">GB/s</span></h3>
+          <div class="w-full bg-slate-800 h-1.5 rounded-full mt-3 overflow-hidden">
+            <div class="bg-gradient-to-r from-blue-500 to-indigo-500 h-full w-[92%]"></div>
+          </div>
+        </div>
+
+        <div class="col-span-2 sm:col-span-1 bg-slate-900/60 border border-slate-800 p-4 rounded-xl backdrop-blur-md relative overflow-hidden group hover:border-cyan-500/40 transition">
+          <div class="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition text-purple-400 text-3xl">
+            <i class="fa-solid fa-shield-halved"></i>
+          </div>
+          <p class="text-xs text-slate-400 uppercase tracking-wider font-semibold">Security Status</p>
+          <h3 class="text-2xl font-extrabold text-emerald-400 mt-1">OPTIMAL</h3>
+          <p class="text-[10px] text-slate-400 mt-2">Zero Threat Anomalies Detected</p>
+        </div>
+      </div>
+
+      <!-- Real-Time Chart Screen Card -->
+      <div class="bg-slate-900/70 border border-slate-800/80 rounded-2xl p-5 shadow-2xl backdrop-blur-xl relative overflow-hidden">
+        <div class="flex justify-between items-center mb-4">
+          <div class="flex items-center space-x-3">
+            <span class="flex h-3 w-3 relative">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-3 w-3 bg-cyan-500"></span>
+            </span>
+            <h2 class="font-bold text-slate-200 text-sm tracking-wide">SYSTEM PERFORMANCE MONITOR</h2>
+          </div>
+          <div class="flex space-x-2 text-xs">
+            <button class="px-2.5 py-1 rounded-lg bg-cyan-500/20 text-cyan-300 border border-cyan-500/40">Live</button>
+            <button class="px-2.5 py-1 rounded-lg bg-slate-800 text-slate-400 hover:text-slate-200">1H</button>
+            <button class="px-2.5 py-1 rounded-lg bg-slate-800 text-slate-400 hover:text-slate-200">24H</button>
+          </div>
+        </div>
+
+        <!-- Chart Canvas -->
+        <div class="h-60 w-full relative">
+          <canvas id="livePerformanceChart"></canvas>
+        </div>
+
+        <!-- Bottom Graphic Bars Stream -->
+        <div class="mt-4 pt-4 border-t border-slate-800/80 grid grid-cols-7 gap-2 items-end h-20 px-2">
+          <div class="flex flex-col items-center h-full justify-end">
+            <div class="w-full bg-gradient-to-t from-cyan-500/20 to-cyan-400 rounded-t bar-anim" style="animation-delay: 0.1s"></div>
+            <span class="text-[10px] text-slate-500 mt-1">NODE 1</span>
+          </div>
+          <div class="flex flex-col items-center h-full justify-end">
+            <div class="w-full bg-gradient-to-t from-cyan-500/20 to-cyan-400 rounded-t bar-anim" style="animation-delay: 0.5s"></div>
+            <span class="text-[10px] text-slate-500 mt-1">NODE 2</span>
+          </div>
+          <div class="flex flex-col items-center h-full justify-end">
+            <div class="w-full bg-gradient-to-t from-cyan-500/20 to-cyan-400 rounded-t bar-anim" style="animation-delay: 0.2s"></div>
+            <span class="text-[10px] text-slate-500 mt-1">NODE 3</span>
+          </div>
+          <div class="flex flex-col items-center h-full justify-end">
+            <div class="w-full bg-gradient-to-t from-cyan-500/20 to-cyan-400 rounded-t bar-anim" style="animation-delay: 0.8s"></div>
+            <span class="text-[10px] text-slate-500 mt-1">NODE 4</span>
+          </div>
+          <div class="flex flex-col items-center h-full justify-end">
+            <div class="w-full bg-gradient-to-t from-cyan-500/20 to-cyan-400 rounded-t bar-anim" style="animation-delay: 0.3s"></div>
+            <span class="text-[10px] text-slate-500 mt-1">NODE 5</span>
+          </div>
+          <div class="flex flex-col items-center h-full justify-end">
+            <div class="w-full bg-gradient-to-t from-cyan-500/20 to-cyan-400 rounded-t bar-anim" style="animation-delay: 0.7s"></div>
+            <span class="text-[10px] text-slate-500 mt-1">NODE 6</span>
+          </div>
+          <div class="flex flex-col items-center h-full justify-end">
+            <div class="w-full bg-gradient-to-t from-cyan-500/20 to-cyan-400 rounded-t bar-anim" style="animation-delay: 0.4s"></div>
+            <span class="text-[10px] text-slate-500 mt-1">NODE 7</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT SIDE: Floating 3D Interactive Glassmorphic Login Card -->
+    <div class="w-full lg:w-5/12 max-w-md perspective-container order-1 lg:order-2">
+      <div id="loginCard" class="glass-card-3d neon-border rounded-2xl p-8 relative preserve-3d">
+        
+        <!-- Subtle Card Light Refraction Gradient -->
+        <div class="absolute inset-0 bg-gradient-to-br from-cyan-500/10 via-transparent to-blue-600/10 rounded-2xl pointer-events-none"></div>
+
+        <!-- Header inside Card -->
+        <div class="text-center mb-8 preserve-3d">
+          <div class="inline-flex p-3 rounded-2xl bg-slate-900/80 border border-slate-700/60 shadow-inner mb-3 translate-z-20">
+            <i class="fa-solid fa-user-shield text-cyan-400 text-2xl"></i>
+          </div>
+          <h2 class="text-2xl font-extrabold text-white tracking-wide translate-z-30">SYSTEM LOGIN</h2>
+          <p class="text-xs text-slate-400 mt-1 translate-z-10">Enter authorization credentials to access report suite</p>
+        </div>
+
+        <!-- Login Form -->
+        <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-5 preserve-3d">
+          
+          <!-- Username / Email Field -->
+          <div class="translate-z-10">
+            <label for="username" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
+              Username / Email
+            </label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-slate-400">
+                <i class="fa-solid fa-envelope"></i>
+              </span>
+              <input 
+                type="text" 
+                id="username" 
+                value="user@analyst.id" 
+                required
+                class="w-full pl-10 pr-4 py-3 bg-slate-950/70 border border-slate-700/80 rounded-xl text-white placeholder-slate-500 text-sm focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 transition shadow-inner"
+                placeholder="operator@system.com"
+              >
+            </div>
+          </div>
+
+          <!-- Password Field -->
+          <div class="translate-z-10">
+            <div class="flex justify-between items-center mb-2">
+              <label for="password" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider">
+                Password
+              </label>
+              <a href="#" onclick="showDemoToast('Reset link sent to administrator')" class="text-xs text-cyan-400 hover:text-cyan-300 transition">Forgot?</a>
+            </div>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-slate-400">
+                <i class="fa-solid fa-lock"></i>
+              </span>
+              <input 
+                type="password" 
+                id="password" 
+                value="password123" 
+                required
+                class="w-full pl-10 pr-10 py-3 bg-slate-950/70 border border-slate-700/80 rounded-xl text-white placeholder-slate-500 text-sm focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 transition shadow-inner"
+                placeholder="••••••••"
+              >
+              <button 
+                type="button" 
+                onclick="togglePasswordVisibility()"
+                class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-200"
+              >
+                <i id="eyeIcon" class="fa-solid fa-eye"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Remember Me & Biometrics -->
+          <div class="flex items-center justify-between text-xs text-slate-400 translate-z-10 pt-1">
+            <label class="flex items-center cursor-pointer space-x-2">
+              <input type="checkbox" checked class="rounded bg-slate-900 border-slate-700 text-cyan-500 focus:ring-cyan-400 focus:ring-offset-slate-900">
+              <span>Remember Session</span>
+            </label>
+            <button type="button" onclick="showDemoToast('Biometric Scanner initialized')" class="text-cyan-400 hover:underline flex items-center gap-1">
+              <i class="fa-solid fa-fingerprint"></i> Biometric
+            </button>
+          </div>
+
+          <!-- Login Button -->
+          <button 
+            type="submit" 
+            id="submitBtn"
+            class="btn-3d w-full py-3.5 px-4 rounded-xl text-white font-bold text-sm tracking-wider uppercase flex items-center justify-center space-x-2 translate-z-20 cursor-pointer mt-4"
+          >
+            <span id="btnText">AUTHENTICATE & LOG IN</span>
+            <i id="btnIcon" class="fa-solid fa-arrow-right text-xs"></i>
+          </button>
+        </form>
+
+        <!-- Security Badge Footer inside Card -->
+        <div class="mt-6 pt-4 border-t border-slate-800/80 text-center translate-z-10">
+          <p class="text-[11px] text-slate-400 flex items-center justify-center gap-1.5">
+            <i class="fa-solid fa-shield-halved text-emerald-400"></i>
+            Encrypted 256-bit TLS connection established
+          </p>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+
+  <!-- OVERLAY DASHBOARD MODAL (Revealed after successful login) -->
+  <div id="fullDashboardModal" class="fixed inset-0 bg-slate-950/95 backdrop-blur-2xl z-50 opacity-0 pointer-events-none transition-opacity duration-500 flex flex-col">
+    <!-- Top Modal Header -->
+    <div class="p-6 border-b border-slate-800 flex justify-between items-center bg-slate-900/50">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-cyan-500 flex items-center justify-center text-slate-950 font-bold text-xl">
+          <i class="fa-solid fa-chart-pie"></i>
+        </div>
+        <div>
+          <h2 class="text-xl font-extrabold text-white">ANALYTICS COMMAND CENTER</h2>
+          <p class="text-xs text-slate-400">Welcome back, <span class="text-cyan-400 font-semibold" id="authenticatedUser">Senior Data Analyst</span></p>
+        </div>
+      </div>
+      <button onclick="closeDashboardModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-sm font-semibold transition flex items-center gap-2">
+        <i class="fa-solid fa-right-from-bracket"></i> Logout
+      </button>
+    </div>
+
+    <!-- Modal Content Grid -->
+    <div class="p-6 overflow-y-auto flex-1 grid grid-cols-1 md:grid-cols-3 gap-6">
+      
+      <!-- Card 1: Revenue Trends -->
+      <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 shadow-xl">
+        <h3 class="text-sm font-bold text-slate-300 mb-3 flex items-center justify-between">
+          REVENUE TRENDS <span class="text-xs text-emerald-400 font-normal">+24.8% YOY</span>
+        </h3>
+        <div class="h-48">
+          <canvas id="revenueModalChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Card 2: Traffic Breakdown -->
+      <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 shadow-xl">
+        <h3 class="text-sm font-bold text-slate-300 mb-3">TRAFFIC SOURCES</h3>
+        <div class="h-48 flex items-center justify-center">
+          <canvas id="doughnutModalChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Card 3: Recent Activity Log -->
+      <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 shadow-xl flex flex-col">
+        <h3 class="text-sm font-bold text-slate-300 mb-3">LIVE SYSTEM LOGS</h3>
+        <div class="space-y-3 text-xs font-mono text-slate-400 flex-1 overflow-y-auto pr-1">
+          <div class="p-2.5 rounded-lg bg-slate-950/60 border border-slate-800/80 flex justify-between">
+            <span class="text-cyan-400">[10:14:02] Auth Granted</span>
+            <span class="text-slate-500">192.168.1.42</span>
+          </div>
+          <div class="p-2.5 rounded-lg bg-slate-950/60 border border-slate-800/80 flex justify-between">
+            <span class="text-emerald-400">[10:13:45] Data Stream Sync</span>
+            <span class="text-slate-500">Node-EU-1</span>
+          </div>
+          <div class="p-2.5 rounded-lg bg-slate-950/60 border border-slate-800/80 flex justify-between">
+            <span class="text-purple-400">[10:12:10] AI Model Deployed</span>
+            <span class="text-slate-500">v3.8-Core</span>
+          </div>
+          <div class="p-2.5 rounded-lg bg-slate-950/60 border border-slate-800/80 flex justify-between">
+            <span class="text-amber-400">[10:10:00] Backup Completed</span>
+            <span class="text-slate-500">Vault-02</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
   </div>
 
+  <!-- Toast Notification Box -->
+  <div id="toast" class="fixed bottom-6 right-6 bg-slate-900 border border-cyan-500/50 text-white px-5 py-3 rounded-xl shadow-2xl z-50 transform translate-y-20 opacity-0 transition-all duration-300 flex items-center space-x-3 pointer-events-none">
+    <i class="fa-solid fa-circle-info text-cyan-400 text-lg"></i>
+    <span id="toastMessage" class="text-xs font-medium">Notification message</span>
+  </div>
+
+  <!-- Footer Info -->
+  <footer class="relative z-20 w-full px-6 py-3 border-t border-slate-800/60 bg-slate-950/60 backdrop-blur-md flex flex-col sm:flex-row justify-between items-center text-xs text-slate-500 gap-2">
+    <p>© 2026 Synapse Analytics Inc. All Rights Reserved.</p>
+    <div class="flex space-x-4">
+      <a href="#" class="hover:text-cyan-400 transition">Privacy Policy</a>
+      <a href="#" class="hover:text-cyan-400 transition">System Architecture</a>
+      <a href="#" class="hover:text-cyan-400 transition">Support Hub</a>
+    </div>
+  </footer>
+
+  <script>
+    /* -------------------------------------------------------------
+       1. 3D INTERACTIVE TILT EFFECT ON HOVER FOR LOGIN CARD
+    ------------------------------------------------------------- */
+    const card = document.getElementById('loginCard');
+
+    document.addEventListener('mousemove', (e) => {
+      const rect = card.getBoundingClientRect();
+      const cardCenterX = rect.left + rect.width / 2;
+      const cardCenterY = rect.top + rect.height / 2;
+
+      // Calculate distance from center of card
+      const mouseX = e.clientX - cardCenterX;
+      const mouseY = e.clientY - cardCenterY;
+
+      // Limit max tilt angles
+      const rotateX = (-mouseY / (window.innerHeight / 2)) * 12;
+      const rotateY = (mouseX / (window.innerWidth / 2)) * 12;
+
+      card.style.transform = `rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg)`;
+    });
+
+    // Reset card perspective on mouse leave
+    document.addEventListener('mouseleave', () => {
+      card.style.transform = `rotateX(0deg) rotateY(0deg)`;
+    });
+
+    /* -------------------------------------------------------------
+       2. REAL-TIME CHART RENDERING (Chart.js)
+    ------------------------------------------------------------- */
+    let liveChart;
+
+    window.onload = function() {
+      const ctx = document.getElementById('livePerformanceChart').getContext('2d');
+
+      // Gradient Fill
+      const gradient = ctx.createLinearGradient(0, 0, 0, 200);
+      gradient.addColorStop(0, 'rgba(0, 210, 255, 0.4)');
+      gradient.addColorStop(1, 'rgba(0, 210, 255, 0.0)');
+
+      liveChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: ['10:00', '10:05', '10:10', '10:15', '10:20', '10:25', '10:30'],
+          datasets: [{
+            label: 'System Load (%)',
+            data: [42, 58, 45, 78, 62, 85, 68],
+            borderColor: '#00d2ff',
+            borderWidth: 3,
+            fill: true,
+            backgroundColor: gradient,
+            tension: 0.4,
+            pointBackgroundColor: '#ffffff',
+            pointBorderColor: '#00d2ff',
+            pointRadius: 4,
+            pointHoverRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: '#0f172a',
+              borderColor: '#00d2ff',
+              borderWidth: 1,
+              titleColor: '#fff',
+              bodyColor: '#00d2ff'
+            }
+          },
+          scales: {
+            x: {
+              grid: { color: 'rgba(255, 255, 255, 0.05)' },
+              ticks: { color: '#64748b', font: { size: 10 } }
+            },
+            y: {
+              grid: { color: 'rgba(255, 255, 255, 0.05)' },
+              ticks: { color: '#64748b', font: { size: 10 } },
+              min: 0,
+              max: 100
+            }
+          }
+        }
+      });
+
+      // Simulate Real-time Dynamic Chart Data Stream Update
+      setInterval(() => {
+        if (liveChart) {
+          const randomVal = Math.floor(Math.random() * 40) + 50;
+          liveChart.data.datasets[0].data.shift();
+          liveChart.data.datasets[0].data.push(randomVal);
+          liveChart.update('none');
+        }
+      }, 2000);
+    };
+
+    /* -------------------------------------------------------------
+       3. INTERACTIVE FORM & DASHBOARD LOGIC
+    ------------------------------------------------------------- */
+    function togglePasswordVisibility() {
+      const passwordInput = document.getElementById('password');
+      const eyeIcon = document.getElementById('eyeIcon');
+      
+      if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        eyeIcon.classList.remove('fa-eye');
+        eyeIcon.classList.add('fa-eye-slash');
+      } else {
+        passwordInput.type = 'password';
+        eyeIcon.classList.remove('fa-eye-slash');
+        eyeIcon.classList.add('fa-eye');
+      }
+    }
+
+    function showDemoToast(message) {
+      const toast = document.getElementById('toast');
+      const toastMsg = document.getElementById('toastMessage');
+      
+      toastMsg.textContent = message;
+      toast.classList.remove('translate-y-20', 'opacity-0', 'pointer-events-none');
+      
+      setTimeout(() => {
+        toast.classList.add('translate-y-20', 'opacity-0', 'pointer-events-none');
+      }, 3000);
+    }
+
+    function handleLogin(event) {
+      event.preventDefault();
+
+      const username = document.getElementById('username').value;
+      const btnText = document.getElementById('btnText');
+      const btnIcon = document.getElementById('btnIcon');
+      const submitBtn = document.getElementById('submitBtn');
+
+      // Loading State Visuals
+      btnText.textContent = "VERIFYING CREDENTIALS...";
+      btnIcon.className = "fa-solid fa-spinner animate-spin text-xs";
+      submitBtn.disabled = true;
+
+      // Simulate API Authentication delay
+      setTimeout(() => {
+        btnText.textContent = "ACCESS GRANTED";
+        btnIcon.className = "fa-solid fa-check text-xs";
+        submitBtn.classList.remove('from-cyan-500', 'to-blue-600');
+        submitBtn.classList.add('from-emerald-500', 'to-teal-600');
+
+        showDemoToast("Authentication successful! Loading dashboard...");
+
+        // Open Overlay Modal after short pause
+        setTimeout(() => {
+          openDashboardModal(username);
+          // Reset Button
+          btnText.textContent = "AUTHENTICATE & LOG IN";
+          btnIcon.className = "fa-solid fa-arrow-right text-xs";
+          submitBtn.disabled = false;
+        }, 800);
+
+      }, 1500);
+    }
+
+    /* -------------------------------------------------------------
+       4. OVERLAY DASHBOARD MODAL & CHARTS INITIALIZATION
+    ------------------------------------------------------------- */
+    let revenueChart, doughnutChart;
+
+    function openDashboardModal(username) {
+      document.getElementById('authenticatedUser').textContent = username || 'Senior Analyst';
+      const modal = document.getElementById('fullDashboardModal');
+      modal.classList.remove('opacity-0', 'pointer-events-none');
+
+      // Initialize Modal Charts if not created
+      if (!revenueChart) {
+        const ctxRev = document.getElementById('revenueModalChart').getContext('2d');
+        revenueChart = new Chart(ctxRev, {
+          type: 'bar',
+          data: {
+            labels: ['Q1', 'Q2', 'Q3', 'Q4'],
+            datasets: [{
+              label: 'Revenue ($M)',
+              data: [12.4, 19.8, 15.2, 24.6],
+              backgroundColor: ['#00d2ff', '#3a7bd5', '#6366f1', '#10b981'],
+              borderRadius: 8
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+              x: { ticks: { color: '#64748b' } },
+              y: { ticks: { color: '#64748b' } }
+            }
+          }
+        });
+      }
+
+      if (!doughnutChart) {
+        const ctxPie = document.getElementById('doughnutModalChart').getContext('2d');
+        doughnutChart = new Chart(ctxPie, {
+          type: 'doughnut',
+          data: {
+            labels: ['Direct API', 'Web Portal', 'Mobile App'],
+            datasets: [{
+              data: [55, 30, 15],
+              backgroundColor: ['#00d2ff', '#3a7bd5', '#8b5cf6'],
+              borderWidth: 0
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: 'bottom',
+                labels: { color: '#cbd5e0', font: { size: 10 } }
+              }
+            }
+          }
+        });
+      }
+    }
+
+    function closeDashboardModal() {
+      const modal = document.getElementById('fullDashboardModal');
+      modal.classList.add('opacity-0', 'pointer-events-none');
+    }
+  </script>
 </body>
 </html>
