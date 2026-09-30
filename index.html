@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>System Login & 3D Analytics Dashboard</title>
+  <title>System Login & 3D Analytics Dashboard - Inspektorat Wilayah II</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -39,7 +39,7 @@
         0 0 30px rgba(0, 210, 255, 0.15),
         inset 0 1px 1px rgba(255, 255, 255, 0.2);
       transform-style: preserve-3d;
-      transition: transform 0.15s ease-out, box-shadow 0.3s ease;
+      transition: transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.3s ease;
     }
 
     .glass-card-3d:hover {
@@ -245,7 +245,7 @@
         </div>
 
         <!-- Bottom Graphic Bars Stream -->
-        <div class="mt-4 pt-4 border-t border-slate-800/80 grid grid-cols-7 gap-2 items-end h-20 px-2">
+        <div class="mt-4 pt-4 border-t border-slate-800/80 grid grid-cols-5 gap-2 items-end h-20 px-2">
           <div class="flex flex-col items-center h-full justify-end">
             <div class="w-full bg-gradient-to-t from-cyan-500/20 to-cyan-400 rounded-t bar-anim" style="animation-delay: 0.1s"></div>
             <span class="text-[10px] text-slate-500 mt-1">Audit</span>
@@ -264,7 +264,7 @@
           </div>
           <div class="flex flex-col items-center h-full justify-end">
             <div class="w-full bg-gradient-to-t from-cyan-500/20 to-cyan-400 rounded-t bar-anim" style="animation-delay: 0.3s"></div>
-            <span class="text-[10px] text-slate-500 mt-1">Pengawasan Lainnya</span>
+            <span class="text-[10px] text-slate-500 mt-1">Pengawasan</span>
           </div>
         </div>
       </div>
@@ -400,7 +400,7 @@
         <h3 class="text-sm font-bold text-slate-300 mb-3 flex items-center justify-between">
           REVENUE TRENDS <span class="text-xs text-emerald-400 font-normal">+24.8% YOY</span>
         </h3>
-        <div class="h-48">
+        <div class="h-48 relative">
           <canvas id="revenueModalChart"></canvas>
         </div>
       </div>
@@ -408,7 +408,7 @@
       <!-- Card 2: Traffic Breakdown -->
       <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 shadow-xl">
         <h3 class="text-sm font-bold text-slate-300 mb-3">TRAFFIC SOURCES</h3>
-        <div class="h-48 flex items-center justify-center">
+        <div class="h-48 relative flex items-center justify-center">
           <canvas id="doughnutModalChart"></canvas>
         </div>
       </div>
@@ -462,6 +462,7 @@
     const card = document.getElementById('loginCard');
 
     document.addEventListener('mousemove', (e) => {
+      if (!card) return;
       const rect = card.getBoundingClientRect();
       const cardCenterX = rect.left + rect.width / 2;
       const cardCenterY = rect.top + rect.height / 2;
@@ -471,15 +472,15 @@
       const mouseY = e.clientY - cardCenterY;
 
       // Limit max tilt angles
-      const rotateX = (-mouseY / (window.innerHeight / 2)) * 12;
-      const rotateY = (mouseX / (window.innerWidth / 2)) * 12;
+      const rotateX = (-mouseY / (window.innerHeight / 2)) * 10;
+      const rotateY = (mouseX / (window.innerWidth / 2)) * 10;
 
       card.style.transform = `rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg)`;
     });
 
     // Reset card perspective on mouse leave
     document.addEventListener('mouseleave', () => {
-      card.style.transform = `rotateX(0deg) rotateY(0deg)`;
+      if (card) card.style.transform = `rotateX(0deg) rotateY(0deg)`;
     });
 
     /* -------------------------------------------------------------
@@ -599,9 +600,7 @@
       setTimeout(() => {
         btnText.textContent = "ACCESS GRANTED";
         btnIcon.className = "fa-solid fa-check text-xs";
-        submitBtn.classList.remove('from-cyan-500', 'to-blue-600');
-        submitBtn.classList.add('from-emerald-500', 'to-teal-600');
-
+        
         showDemoToast("Authentication successful! Loading dashboard...");
 
         // Open Overlay Modal after short pause
@@ -626,56 +625,58 @@
       const modal = document.getElementById('fullDashboardModal');
       modal.classList.remove('opacity-0', 'pointer-events-none');
 
-      // Initialize Modal Charts if not created
-      if (!revenueChart) {
-        const ctxRev = document.getElementById('revenueModalChart').getContext('2d');
-        revenueChart = new Chart(ctxRev, {
-          type: 'bar',
-          data: {
-            labels: ['Q1', 'Q2', 'Q3', 'Q4'],
-            datasets: [{
-              label: 'Revenue ($M)',
-              data: [12.4, 19.8, 15.2, 24.6],
-              backgroundColor: ['#00d2ff', '#3a7bd5', '#6366f1', '#10b981'],
-              borderRadius: 8
-            }]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
-            scales: {
-              x: { ticks: { color: '#64748b' } },
-              y: { ticks: { color: '#64748b' } }
-            }
-          }
-        });
-      }
-
-      if (!doughnutChart) {
-        const ctxPie = document.getElementById('doughnutModalChart').getContext('2d');
-        doughnutChart = new Chart(ctxPie, {
-          type: 'doughnut',
-          data: {
-            labels: ['Direct API', 'Web Portal', 'Mobile App'],
-            datasets: [{
-              data: [55, 30, 15],
-              backgroundColor: ['#00d2ff', '#3a7bd5', '#8b5cf6'],
-              borderWidth: 0
-            }]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-              legend: {
-                position: 'bottom',
-                labels: { color: '#cbd5e0', font: { size: 10 } }
+      // Allow modal DOM to render before instantiating charts to avoid zero-width issues
+      setTimeout(() => {
+        if (!revenueChart) {
+          const ctxRev = document.getElementById('revenueModalChart').getContext('2d');
+          revenueChart = new Chart(ctxRev, {
+            type: 'bar',
+            data: {
+              labels: ['Q1', 'Q2', 'Q3', 'Q4'],
+              datasets: [{
+                label: 'Revenue ($M)',
+                data: [12.4, 19.8, 15.2, 24.6],
+                backgroundColor: ['#00d2ff', '#3a7bd5', '#6366f1', '#10b981'],
+                borderRadius: 8
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: { legend: { display: false } },
+              scales: {
+                x: { ticks: { color: '#64748b' } },
+                y: { ticks: { color: '#64748b' } }
               }
             }
-          }
-        });
-      }
+          });
+        }
+
+        if (!doughnutChart) {
+          const ctxPie = document.getElementById('doughnutModalChart').getContext('2d');
+          doughnutChart = new Chart(ctxPie, {
+            type: 'doughnut',
+            data: {
+              labels: ['Direct API', 'Web Portal', 'Mobile App'],
+              datasets: [{
+                data: [55, 30, 15],
+                backgroundColor: ['#00d2ff', '#3a7bd5', '#8b5cf6'],
+                borderWidth: 0
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: {
+                  position: 'bottom',
+                  labels: { color: '#cbd5e0', font: { size: 10 } }
+                }
+              }
+            }
+          });
+        }
+      }, 100);
     }
 
     function closeDashboardModal() {
