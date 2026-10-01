@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Dashboard Monitoring Inspektorat Wilayah II</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-900 min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
+
+    <!-- Background Decorative Elements -->
+    <div class="absolute -top-40 -left-40 w-96 h-96 bg-blue-600/20 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute -bottom-40 -right-40 w-96 h-96 bg-indigo-600/20 rounded-full blur-3xl pointer-events-none"></div>
+
+    <div class="w-full max-w-md relative z-10">
+        
+        <!-- Brand Header -->
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-500 text-white shadow-lg shadow-blue-500/30 mb-4 transform hover:rotate-6 transition-transform">
+                <i class="fa-solid fa-shield-halved text-3xl"></i>
+            </div>
+            <h1 class="text-2xl font-extrabold text-white tracking-tight">Kementerian Hak Asasi Manusia</h1>
+            <p class="text-blue-400 font-medium text-sm mt-1">Inspektorat Jenderal — Inspektorat Wilayah II</p>
+        </div>
+
+        <!-- Card Form Login -->
+        <div class="bg-slate-800/80 backdrop-blur-xl border border-slate-700/60 rounded-3xl p-8 shadow-2xl relative">
+            <div class="mb-6">
+                <h2 class="text-xl font-bold text-white">Selamat Datang</h2>
+                <p class="text-slate-400 text-xs mt-1">Silakan masuk dengan akun Anda untuk mengakses dashboard monitoring.</p>
+            </div>
+
+            <!-- Error Notification Alert -->
+            <div id="errorAlert" class="hidden mb-5 p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs flex items-center gap-3">
+                <i class="fa-solid fa-circle-exclamation text-base shrink-0"></i>
+                <span id="errorMessage">Username atau password salah!</span>
+            </div>
+
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <!-- Username Input -->
+                <div class="mb-4">
+                    <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Username / NIP</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
+                            <i class="fa-regular fa-user text-sm"></i>
+                        </span>
+                        <input type="text" id="username" required autocomplete="username"
+                            placeholder="Masukkan username" 
+                            class="w-full pl-10 pr-4 py-3 bg-slate-900/80 border border-slate-700 text-white rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                    </div>
+                </div>
+
+                <!-- Password Input -->
+                <div class="mb-4">
+                    <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Password</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
+                            <i class="fa-solid fa-lock text-sm"></i>
+                        </span>
+                        <input type="password" id="password" required autocomplete="current-password"
+                            placeholder="••••••••" 
+                            class="w-full pl-10 pr-10 py-3 bg-slate-900/80 border border-slate-700 text-white rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                        <button type="button" onclick="togglePasswordVisibility()" class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-white transition-colors">
+                            <i id="toggleIcon" class="fa-regular fa-eye text-sm"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Remember Me Checkbox -->
+                <div class="flex items-center justify-between mb-6">
+                    <label class="flex items-center text-xs text-slate-300 cursor-pointer select-none">
+                        <input type="checkbox" id="rememberMe" class="rounded bg-slate-900 border-slate-700 text-blue-600 focus:ring-blue-500 w-4 h-4 mr-2">
+                        Ingat Saya di Perangkat Ini
+                    </label>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" id="submitBtn" 
+                    class="w-full py-3.5 px-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-semibold rounded-xl text-sm shadow-lg shadow-blue-600/30 transition-all transform hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2">
+                    <span>Masuk ke System</span>
+                    <i class="fa-solid fa-arrow-right text-xs"></i>
+                </button>
+            </form>
+
+            <!-- Predefined Accounts Helper Modal / Accordion -->
+            <div class="mt-8 pt-6 border-t border-slate-700/60">
+                <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-2">Akun Pengujian Demo System:</p>
+                <div class="grid grid-cols-2 gap-2 text-xs">
+                    <button type="button" onclick="fillAccount('admin', 'admin123')" class="p-2 bg-slate-900/50 border border-slate-700/50 hover:border-blue-500/50 rounded-lg text-left transition-colors">
+                        <div class="font-bold text-blue-400">Admin</div>
+                        <div class="text-[10px] text-slate-400">admin / admin123</div>
+                    </button>
+                    <button type="button" onclick="fillAccount('auditor', 'auditor123')" class="p-2 bg-slate-900/50 border border-slate-700/50 hover:border-emerald-500/50 rounded-lg text-left transition-colors">
+                        <div class="font-bold text-emerald-400">Auditor</div>
+                        <div class="text-[10px] text-slate-400">auditor / auditor123</div>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <p class="text-center text-xs text-slate-500 mt-6">
+            &copy; 2026 Inspektorat Wilayah II - Kementerian HAM RI. All rights reserved.
+        </p>
+    </div>
+
+    <script>
+        // Data pengguna terdaftar (Database simulasi)
+        const USERS_DB = [
+            { username: 'admin', name: 'Dr. Indra Jaya Ali, S.E., M.Si.', role: 'Administrator', subwil: 'Inspektur Wilayah II', password: 'admin123' },
+            { username: 'auditor', name: 'Nor Ustadi', role: 'Auditor Pertama', subwil: 'Sub-Wilayah 1', password: 'auditor123' },
+            { username: 'viewer', name: 'Tamu / Executive', role: 'Viewer', subwil: 'Sekretariat', password: 'viewer123' }
+        ];
+
+        // Cek jika pengguna sudah pernah login
+        document.addEventListener("DOMContentLoaded", function() {
+            const currentSession = localStorage.getItem('itwil2_session') || sessionStorage.getItem('itwil2_session');
+            if (currentSession) {
+                window.location.href = 'index.html';
+            }
+        });
+
+        // Toggle password visibility
+        function togglePasswordVisibility() {
+            const passwordInput = document.getElementById('password');
+            const toggleIcon = document.getElementById('toggleIcon');
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.classList.replace('fa-eye', 'fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.classList.replace('fa-eye-slash', 'fa-eye');
+            }
+        }
+
+        // Isi kredensial cepat
+        function fillAccount(username, password) {
+            document.getElementById('username').value = username;
+            document.getElementById('password').value = password;
+        }
+
+        // Handler saat Form Login disubmit
+        function handleLogin(e) {
+            e.preventDefault();
+            const usernameInput = document.getElementById('username').value.trim();
+            const passwordInput = document.getElementById('password').value;
+            const rememberMe = document.getElementById('rememberMe').checked;
+            const errorAlert = document.getElementById('errorAlert');
+
+            // Pencarian Pengguna
+            const user = USERS_DB.find(u => u.username.toLowerCase() === usernameInput.toLowerCase() && u.password === passwordInput);
+
+            if (user) {
+                // Buat objek session
+                const sessionData = {
+                    username: user.username,
+                    name: user.name,
+                    role: user.role,
+                    subwil: user.subwil,
+                    loginTime: new Date().toISOString()
+                };
+
+                // Simpan ke storage sesuai pilihan Remember Me
+                if (rememberMe) {
+                    localStorage.setItem('itwil2_session', JSON.stringify(sessionData));
+                } else {
+                    sessionStorage.setItem('itwil2_session', JSON.stringify(sessionData));
+                }
+
+                // Redirect ke Dashboard Utama
+                window.location.href = 'index.html';
+            } else {
+                errorAlert.classList.remove('hidden');
+                document.getElementById('errorMessage').innerText = 'Username atau Password salah!';
+            }
+        }
+    </script>
+</body>
+</html>
