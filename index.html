@@ -53,7 +53,6 @@
 
     <style>
         body { font-family: 'Inter', sans-serif; }
-        /* Custom scrollbar for table containers */
         .custom-scrollbar::-webkit-scrollbar { height: 6px; width: 6px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
@@ -62,31 +61,7 @@
 </head>
 <body class="h-full text-slate-800 flex flex-col min-h-screen">
 
-    <!-- HEADER UTAMA -->
-<header class="bg-slate-800 border-b border-slate-700 px-6 py-4 flex items-center justify-between">
-    <!-- Judul / Logo Dashboard -->
-    <div class="flex items-center gap-3">
-        <h1 class="text-lg font-bold text-white">Monitoring Kegiatan - ITWIL II</h1>
-    </div>
-
-    <!-- User Profile & Tombol Logout -->
-    <div class="flex items-center gap-4">
-        <!-- Informasi User -->
-        <div class="text-right">
-            <div id="userName" class="text-sm font-semibold text-white">Administrator</div>
-            <div id="userRole" class="text-xs text-slate-400">Inspektorat Wilayah II</div>
-        </div>
-
-        <!-- TAUTAN LOGOUT -->
-        <a href="logout.html" 
-           class="flex items-center gap-2 px-3 py-2 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 rounded-xl text-xs font-semibold transition-all">
-            <i class="fa-solid fa-right-from-bracket"></i>
-            <span>Keluar</span>
-        </a>
-    </div>
-</header>
-
-    <!-- HEADER & NAVBAR -->
+    <!-- HEADER UTAMA & NAVBAR -->
     <header class="bg-slate-900 text-white sticky top-0 z-30 shadow-md">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
@@ -101,16 +76,28 @@
                     </div>
                 </div>
 
-                <!-- Info Header Right -->
-                <div class="hidden md:flex items-center space-x-6">
-                    <div class="text-right">
+                <!-- Live Clock & User Profile & Logout -->
+                <div class="flex items-center space-x-6">
+                    <div class="hidden md:block text-right">
                         <div id="liveClock" class="text-sm font-semibold tracking-wider text-brand-100">--:--:-- WIB</div>
                         <div id="liveDate" class="text-xs text-slate-400">Hari, 00 Bulan 0000</div>
                     </div>
-                    <div class="h-8 w-px bg-slate-700"></div>
-                    <div class="flex items-center space-x-2 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 px-3 py-1 rounded-full text-xs font-medium">
-                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                        <span>Sistem Aktif</span>
+                    
+                    <div class="h-8 w-px bg-slate-700 hidden md:block"></div>
+
+                    <!-- User Info & Logout Button -->
+                    <div class="flex items-center gap-3">
+                        <div class="text-right">
+                            <div id="displayUserName" class="text-xs font-bold text-white">Administrator</div>
+                            <div id="displayUserRole" class="text-[10px] text-slate-400">Inspektorat Wilayah II</div>
+                        </div>
+
+                        <a href="logout.html" 
+                           title="Keluar dari sistem"
+                           class="flex items-center gap-2 px-3 py-1.5 bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/30 rounded-lg text-xs font-semibold transition-all">
+                            <i class="fa-solid fa-right-from-bracket"></i>
+                            <span class="hidden sm:inline">Keluar</span>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -127,13 +114,9 @@
                 <p class="text-sm text-slate-500">Pantau progres pengawasan dan dokumen terkait secara real-time.</p>
             </div>
             <div class="flex items-center space-x-3">
-                <button onclick="openModal('modalDokumen')" class="inline-flex items-center justify-center px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium text-sm rounded-lg transition shadow-sm border border-slate-300">
-                    <i class="fa-solid fa-file-circle-plus mr-2 text-brand-600"></i>
-                    Upload Dokumen
-                </button>
-                <button onclick="openModal('modalKegiatan')" class="inline-flex items-center justify-center px-4 py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-medium text-sm rounded-lg transition shadow-sm">
+                <button onclick="openModalKegiatan()" class="inline-flex items-center justify-center px-4 py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-medium text-sm rounded-lg transition shadow-sm">
                     <i class="fa-solid fa-plus mr-2"></i>
-                    Input Kegiatan Baru
+                    Input Kegiatan & Dokumen Baru
                 </button>
             </div>
         </div>
@@ -215,7 +198,7 @@
 
         <!-- CHARTS SECTION -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <!-- Chart Status Kegiatan (Donut) -->
+            <!-- Chart Status Kegiatan -->
             <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
                 <div>
                     <h3 class="text-base font-bold text-slate-900 flex items-center">
@@ -227,11 +210,11 @@
                     <canvas id="chartStatus"></canvas>
                 </div>
                 <div class="text-center text-xs text-slate-400 border-t pt-3">
-                    Pembaruan otomatis berdasarkan database
+                    Pembaruan otomatis berdasarkan data sistem
                 </div>
             </div>
 
-            <!-- Chart Progres Tim (Bar) -->
+            <!-- Chart Progres Tim -->
             <div class="lg:col-span-2 bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
                 <div>
                     <h3 class="text-base font-bold text-slate-900 flex items-center">
@@ -250,16 +233,14 @@
 
         <!-- TABEL DAFTAR KEGIATAN -->
         <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-            <!-- Header Table Controls -->
             <div class="p-5 border-b border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-50/50">
                 <div>
                     <h3 class="text-lg font-bold text-slate-900 flex items-center">
                         <i class="fa-solid fa-list text-brand-600 mr-2"></i> Daftar Kegiatan & Pengawasan
                     </h3>
-                    <p class="text-xs text-slate-500 mt-0.5">Kelola data kegiatan, atur progres, dan pantau status pelaksanaan.</p>
+                    <p class="text-xs text-slate-500 mt-0.5">Kelola data kegiatan, atur progres, dan lihat dokumen terlampir.</p>
                 </div>
 
-                <!-- Filter and Search -->
                 <div class="flex flex-col sm:flex-row items-center gap-3">
                     <div class="relative w-full sm:w-64">
                         <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
@@ -278,7 +259,6 @@
                 </div>
             </div>
 
-            <!-- Table Body -->
             <div class="overflow-x-auto custom-scrollbar">
                 <table class="w-full text-left border-collapse text-sm">
                     <thead>
@@ -287,7 +267,8 @@
                             <th class="py-3.5 px-4">Tim / Sub-Wilayah</th>
                             <th class="py-3.5 px-4">Jadwal Pelaksanaan</th>
                             <th class="py-3.5 px-4">Status</th>
-                            <th class="py-3.5 px-4 w-44">Progres</th>
+                            <th class="py-3.5 px-4 w-36">Progres</th>
+                            <th class="py-3.5 px-4">Dokumen</th>
                             <th class="py-3.5 px-4 text-center">Aksi</th>
                         </tr>
                     </thead>
@@ -300,20 +281,15 @@
 
         <!-- TABEL DAFTAR DOKUMEN -->
         <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-            <!-- Header Table Controls -->
             <div class="p-5 border-b border-slate-200 flex items-center justify-between bg-slate-50/50">
                 <div>
                     <h3 class="text-lg font-bold text-slate-900 flex items-center">
                         <i class="fa-solid fa-folder-closed text-brand-600 mr-2"></i> Berkas & Dokumen Terupload
                     </h3>
-                    <p class="text-xs text-slate-500 mt-0.5">Daftar laporan hasil pengawasan, KKP, dan dokumen pendukung.</p>
+                    <p class="text-xs text-slate-500 mt-0.5">Seluruh arsip laporan hasil pengawasan, KKP, dan dokumen pendukung.</p>
                 </div>
-                <button onclick="openModal('modalDokumen')" class="text-xs font-semibold text-brand-600 hover:text-brand-800 flex items-center gap-1">
-                    <i class="fa-solid fa-upload"></i> Upload Baru
-                </button>
             </div>
 
-            <!-- Table Body -->
             <div class="overflow-x-auto custom-scrollbar">
                 <table class="w-full text-left border-collapse text-sm">
                     <thead>
@@ -338,137 +314,126 @@
     <!-- FOOTER -->
     <footer class="bg-white border-t border-slate-200 mt-auto py-6">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-xs text-slate-500">
-            <p>&copy; 2026 Inspektorat Wilayah II - Dashboard Monitoring & Manajemen Dokumen Internal.</p>
+            <p>&copy; 2026 Inspektorat Wilayah II - Kementerian Hak Asasi Manusia. All rights reserved.</p>
         </div>
     </footer>
 
-    <!-- MODAL 1: FORM INPUT / EDIT KEGIATAN -->
+    <!-- MODAL INTEGRATED FORM: KEGIATAN & UPLOAD DOKUMEN -->
     <div id="modalKegiatan" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-white rounded-2xl shadow-xl max-w-lg w-full overflow-hidden transform transition-all">
-            <div class="px-6 py-4 bg-slate-900 text-white flex justify-between items-center">
+        <div class="bg-white rounded-2xl shadow-xl max-w-2xl w-full max-h-[90vh] flex flex-col overflow-hidden transform transition-all">
+            <div class="px-6 py-4 bg-slate-900 text-white flex justify-between items-center shrink-0">
                 <h3 id="modalKegiatanTitle" class="font-bold text-base flex items-center">
-                    <i class="fa-solid fa-calendar-plus text-brand-500 mr-2"></i> Input Kegiatan Baru
+                    <i class="fa-solid fa-calendar-plus text-brand-500 mr-2"></i> Input Kegiatan & Upload Dokumen
                 </h3>
                 <button onclick="closeModal('modalKegiatan')" class="text-slate-400 hover:text-white transition">
                     <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
             </div>
             
-            <form id="formKegiatan" onsubmit="saveKegiatan(event)" class="p-6 space-y-4">
+            <form id="formKegiatan" onsubmit="saveKegiatan(event)" class="p-6 overflow-y-auto space-y-5 custom-scrollbar">
                 <input type="hidden" id="kegiatanId">
 
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Nama Kegiatan / Audit <span class="text-red-500">*</span></label>
-                    <input type="text" id="inputNamaKegiatan" required placeholder="Contoh: Audit Kinerja Program Stunting 2026" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
-                </div>
+                <!-- INFORMASI UTAMA KEGIATAN -->
+                <div class="space-y-4">
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-brand-700 bg-brand-50 p-2 rounded-md flex items-center">
+                        <i class="fa-solid fa-info-circle mr-2"></i> Informasi Utama Kegiatan
+                    </h4>
 
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Tim / Sub Wilayah <span class="text-red-500">*</span></label>
-                    <select id="inputTim" required class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
-                        <option value="">-- Pilih Tim --</option>
-                        <option value="Tim Audit I">Tim Audit I</option>
-                        <option value="Tim Audit II">Tim Audit II</option>
-                        <option value="Tim Evaluasi & Reviu">Tim Evaluasi & Reviu</option>
-                        <option value="Tim Pengawasan Khusus">Tim Pengawasan Khusus</option>
-                    </select>
-                </div>
-
-                <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Tanggal Mulai <span class="text-red-500">*</span></label>
-                        <input type="date" id="inputTglMulai" required class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                        <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Nama Kegiatan / Audit <span class="text-red-500">*</span></label>
+                        <input type="text" id="inputNamaKegiatan" required placeholder="Contoh: Audit Kinerja Program Stunting 2026" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
                     </div>
-                    <div>
-                        <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Tanggal Selesai <span class="text-red-500">*</span></label>
-                        <input type="date" id="inputTglSelesai" required class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
-                    </div>
-                </div>
 
-                <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Status Pelaksanaan <span class="text-red-500">*</span></label>
-                        <select id="inputStatus" required class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
-                            <option value="Belum Dimulai">Belum Dimulai</option>
-                            <option value="Dalam Proses">Dalam Proses</option>
-                            <option value="Selesai">Selesai</option>
-                            <option value="Ditunda">Ditunda</option>
+                        <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Tim / Sub Wilayah <span class="text-red-500">*</span></label>
+                        <select id="inputTim" required class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                            <option value="">-- Pilih Tim --</option>
+                            <option value="Tim Audit I">Tim Audit I</option>
+                            <option value="Tim Audit II">Tim Audit II</option>
+                            <option value="Tim Evaluasi & Reviu">Tim Evaluasi & Reviu</option>
+                            <option value="Tim Pengawasan Khusus">Tim Pengawasan Khusus</option>
                         </select>
                     </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Tanggal Mulai <span class="text-red-500">*</span></label>
+                            <input type="date" id="inputTglMulai" required class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Tanggal Selesai <span class="text-red-500">*</span></label>
+                            <input type="date" id="inputTglSelesai" required class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Status Pelaksanaan <span class="text-red-500">*</span></label>
+                            <select id="inputStatus" required class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                                <option value="Belum Dimulai">Belum Dimulai</option>
+                                <option value="Dalam Proses">Dalam Proses</option>
+                                <option value="Selesai">Selesai</option>
+                                <option value="Ditunda">Ditunda</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Progres (%) <span class="text-red-500">*</span></label>
+                            <input type="number" id="inputProgres" min="0" max="100" value="0" required class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                        </div>
+                    </div>
+
                     <div>
-                        <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Progres (%)</label>
-                        <input type="number" id="inputProgres" min="0" max="100" value="0" required class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                        <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Keterangan / Catatan</label>
+                        <textarea id="inputKeterangan" rows="2" placeholder="Catatan progress atau kendala lapangan..." class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none"></textarea>
                     </div>
                 </div>
 
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Keterangan / Catatan</label>
-                    <textarea id="inputKeterangan" rows="3" placeholder="Catatan progress atau kendala lapangan..." class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none"></textarea>
+                <!-- SEKSI LAMPIRAN DOKUMEN -->
+                <div class="space-y-4 pt-2 border-t border-slate-200">
+                    <div class="flex items-center justify-between bg-indigo-50 p-2 rounded-md">
+                        <h4 class="text-xs font-bold uppercase tracking-wider text-indigo-700 flex items-center">
+                            <i class="fa-solid fa-paperclip mr-2"></i> Upload File Lampiran Dokumen
+                        </h4>
+                        <button type="button" onclick="addDocumentRow()" class="text-xs font-semibold text-indigo-600 hover:text-indigo-800 flex items-center gap-1">
+                            <i class="fa-solid fa-plus-circle"></i> Tambah File Lain
+                        </button>
+                    </div>
+
+                    <div id="documentRowsContainer" class="space-y-3">
+                        <!-- Default initial document row -->
+                        <div class="doc-row border border-slate-200 bg-slate-50/50 p-3 rounded-xl space-y-3 relative">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-[11px] font-semibold text-slate-600 mb-1">Kategori Dokumen</label>
+                                    <select class="doc-kategori w-full px-3 py-1.5 border border-slate-300 rounded-lg text-xs bg-white">
+                                        <option value="Laporan Hasil (LHP)">Laporan Hasil (LHP)</option>
+                                        <option value="Surat Tugas (SPT)">Surat Tugas (SPT)</option>
+                                        <option value="Kertas Kerja (KKP)">Kertas Kerja (KKP)</option>
+                                        <option value="Nota Dinas">Nota Dinas</option>
+                                        <option value="Dokumen Pendukung">Dokumen Pendukung</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-[11px] font-semibold text-slate-600 mb-1">File Dokumen (PDF, DOCX, XLSX)</label>
+                                    <input type="file" class="doc-file w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="flex justify-end space-x-3 pt-3 border-t">
+                <div class="flex justify-end space-x-3 pt-4 border-t shrink-0">
                     <button type="button" onclick="closeModal('modalKegiatan')" class="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg text-sm hover:bg-slate-50 font-medium">Batal</button>
-                    <button type="submit" class="px-4 py-2 bg-brand-600 text-white rounded-lg text-sm hover:bg-brand-700 font-medium shadow-sm">Simpan Kegiatan</button>
+                    <button type="submit" class="px-5 py-2 bg-brand-600 text-white rounded-lg text-sm hover:bg-brand-700 font-semibold shadow-sm flex items-center gap-2">
+                        <i class="fa-solid fa-floppy-disk"></i>
+                        <span>Simpan Kegiatan & Dokumen</span>
+                    </button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- MODAL 2: FORM UPLOAD DOKUMEN -->
-    <div id="modalDokumen" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-white rounded-2xl shadow-xl max-w-lg w-full overflow-hidden transform transition-all">
-            <div class="px-6 py-4 bg-slate-900 text-white flex justify-between items-center">
-                <h3 class="font-bold text-base flex items-center">
-                    <i class="fa-solid fa-file-circle-plus text-indigo-400 mr-2"></i> Upload Dokumen Baru
-                </h3>
-                <button onclick="closeModal('modalDokumen')" class="text-slate-400 hover:text-white transition">
-                    <i class="fa-solid fa-xmark text-lg"></i>
-                </button>
-            </div>
-            
-            <form id="formDokumen" onsubmit="saveDokumen(event)" class="p-6 space-y-4">
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Judul / Nama Laporan <span class="text-red-500">*</span></label>
-                    <input type="text" id="inputJudulDokumen" required placeholder="Contoh: LHP Akhir Audit Stunting 2026" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
-                </div>
-
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Terkait Kegiatan <span class="text-red-500">*</span></label>
-                    <select id="inputTerkaitKegiatan" required class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
-                        <!-- Populated dynamically from Kegiatan list -->
-                    </select>
-                </div>
-
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Kategori Dokumen <span class="text-red-500">*</span></label>
-                    <select id="inputKategoriDokumen" required class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
-                        <option value="Laporan Hasil (LHP)">Laporan Hasil (LHP)</option>
-                        <option value="Surat Tugas (SPT)">Surat Tugas (SPT)</option>
-                        <option value="Kertas Kerja (KKP)">Kertas Kerja (KKP)</option>
-                        <option value="Dokumen Pendukung">Dokumen Pendukung</option>
-                        <option value="Nota Dinas">Nota Dinas</option>
-                    </select>
-                </div>
-
-                <!-- Dropzone Area -->
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">File Dokumen (PDF, DOCX, XLSX)</label>
-                    <div class="border-2 border-dashed border-slate-300 rounded-xl p-4 text-center hover:bg-slate-50 transition cursor-pointer" onclick="document.getElementById('inputFile').click()">
-                        <i class="fa-solid fa-cloud-arrow-up text-3xl text-brand-500 mb-2"></i>
-                        <p class="text-xs text-slate-600 font-medium">Klik untuk memilih file dari komputer Anda</p>
-                        <p id="fileNameDisplay" class="text-xs text-brand-600 font-semibold mt-1">Belum ada file dipilih</p>
-                        <input type="file" id="inputFile" class="hidden" onchange="updateFileName(this)">
-                    </div>
-                </div>
-
-                <div class="flex justify-end space-x-3 pt-3 border-t">
-                    <button type="button" onclick="closeModal('modalDokumen')" class="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg text-sm hover:bg-slate-50 font-medium">Batal</button>
-                    <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm hover:bg-indigo-700 font-medium shadow-sm">Simpan & Upload</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- MODAL 3: DETAIL KEGIATAN -->
+    <!-- MODAL DETAIL KEGIATAN -->
     <div id="modalDetail" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-2xl shadow-xl max-w-lg w-full overflow-hidden">
             <div class="px-6 py-4 bg-slate-900 text-white flex justify-between items-center">
@@ -479,7 +444,7 @@
                     <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
             </div>
-            <div id="detailContent" class="p-6 space-y-4">
+            <div id="detailContent" class="p-6 space-y-4 text-sm">
                 <!-- Content Injected via JavaScript -->
             </div>
             <div class="px-6 py-3 bg-slate-50 border-t flex justify-end">
@@ -494,19 +459,12 @@
         <span id="toastMessage" class="text-sm font-medium">Pesan notifikasi</span>
     </div>
 
+    <!-- JAVASCRIPT SYSTEM LOGIC -->
     <script>
-        function checkAuth() {
-        const session = localStorage.getItem('itwil2_session') || sessionStorage.getItem('itwil2_session');
-        if (!session) {
-            // Jika belum login, redirect ke halaman login
-            window.location.href = 'login.html';
-        }
-    
-        // --- DATA STORAGE & INITIALIZATION ---
         const STORAGE_KEY_KEGIATAN = 'itwil2_kegiatan_data';
         const STORAGE_KEY_DOKUMEN = 'itwil2_dokumen_data';
 
-        // Default Initial Data if empty
+        // Default Initial Data
         const defaultKegiatan = [
             {
                 id: '101',
@@ -561,49 +519,56 @@
             }
         ];
 
+        // State Global
         let kegiatanData = JSON.parse(localStorage.getItem(STORAGE_KEY_KEGIATAN)) || defaultKegiatan;
         let dokumenData = JSON.parse(localStorage.getItem(STORAGE_KEY_DOKUMEN)) || defaultDokumen;
-
         let chartStatusInstance = null;
         let chartTimInstance = null;
 
-        // Save State
-        function saveData() {
-            localStorage.setItem(STORAGE_KEY_KEGIATAN, JSON.stringify(kegiatanData));
-            localStorage.setItem(STORAGE_KEY_DOKUMEN, JSON.stringify(dokumenData));
-            renderAll();
-        }
-
-        // On Page Load
-        window.addEventListener('DOMContentLoaded', () => {
-            initClock();
+        // Init App
+        document.addEventListener("DOMContentLoaded", function() {
+            displaySessionUserInfo();
+            startLiveClock();
+            saveDataToStorage();
             renderAll();
         });
 
+        function displaySessionUserInfo() {
+            const sessionRaw = localStorage.getItem('itwil2_session') || sessionStorage.getItem('itwil2_session');
+            if (sessionRaw) {
+                try {
+                    const session = JSON.parse(sessionRaw);
+                    if (session.name) document.getElementById('displayUserName').innerText = session.name;
+                    if (session.role) document.getElementById('displayUserRole').innerText = session.role;
+                } catch(e) {}
+            }
+        }
+
+        function startLiveClock() {
+            function updateClock() {
+                const now = new Date();
+                const optionsDate = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                document.getElementById('liveDate').innerText = now.toLocaleDateString('id-ID', optionsDate);
+                document.getElementById('liveClock').innerText = now.toLocaleTimeString('id-ID') + ' WIB';
+            }
+            updateClock();
+            setInterval(updateClock, 1000);
+        }
+
+        function saveDataToStorage() {
+            localStorage.setItem(STORAGE_KEY_KEGIATAN, JSON.stringify(kegiatanData));
+            localStorage.setItem(STORAGE_KEY_DOKUMEN, JSON.stringify(dokumenData));
+        }
+
         function renderAll() {
-            renderStatCards();
+            renderStats();
             renderKegiatanTable();
             renderDokumenTable();
             renderCharts();
-            populateKegiatanDropdown();
         }
 
-        // Live Clock
-        function initClock() {
-            const updateTime = () => {
-                const now = new Date();
-                const clock = document.getElementById('liveClock');
-                const date = document.getElementById('liveDate');
-                
-                clock.innerText = now.toLocaleTimeString('id-ID') + ' WIB';
-                date.innerText = now.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-            };
-            updateTime();
-            setInterval(updateTime, 1000);
-        }
-
-        // Render Statistics
-        function renderStatCards() {
+        // STATS COMPUTATION
+        function renderStats() {
             const total = kegiatanData.length;
             const selesai = kegiatanData.filter(k => k.status === 'Selesai').length;
             const proses = kegiatanData.filter(k => k.status === 'Dalam Proses').length;
@@ -621,67 +586,60 @@
             document.getElementById('statProsesPct').innerText = prosesPct + '%';
         }
 
-        // Render Table Kegiatan
+        // RENDER TABLE KEGIATAN
         function renderKegiatanTable() {
             const tbody = document.getElementById('kegiatanTableBody');
             const search = document.getElementById('searchInput').value.toLowerCase();
             const filter = document.getElementById('filterStatus').value;
 
-            const filteredData = kegiatanData.filter(item => {
-                const matchesSearch = item.nama.toLowerCase().includes(search) || item.tim.toLowerCase().includes(search);
-                const matchesStatus = (filter === 'ALL') || (item.status === filter);
-                return matchesSearch && matchesStatus;
+            let filtered = kegiatanData.filter(item => {
+                const matchSearch = item.nama.toLowerCase().includes(search) || item.tim.toLowerCase().includes(search);
+                const matchFilter = filter === 'ALL' || item.status === filter;
+                return matchSearch && matchFilter;
             });
 
-            if (filteredData.length === 0) {
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="6" class="py-8 text-center text-slate-400">
-                            <i class="fa-regular fa-folder-open text-3xl mb-2"></i>
-                            <p class="text-sm">Tidak ada kegiatan yang ditemukan.</p>
-                        </td>
-                    </tr>
-                `;
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="py-8 text-center text-slate-400 text-sm">Tidak ada kegiatan yang ditemukan</td></tr>`;
                 return;
             }
 
-            tbody.innerHTML = filteredData.map(item => {
-                const badgeClass = getStatusBadge(item.status);
-                const barColor = getProgresBarColor(item.progres);
+            tbody.innerHTML = filtered.map(item => {
+                const docCount = dokumenData.filter(d => d.kegiatanId === item.id).length;
+                
+                let badgeClass = 'bg-slate-100 text-slate-700';
+                if (item.status === 'Selesai') badgeClass = 'bg-emerald-100 text-emerald-800 border-emerald-200';
+                else if (item.status === 'Dalam Proses') badgeClass = 'bg-amber-100 text-amber-800 border-amber-200';
+                else if (item.status === 'Belum Dimulai') badgeClass = 'bg-slate-100 text-slate-600 border-slate-200';
+                else if (item.status === 'Ditunda') badgeClass = 'bg-rose-100 text-rose-800 border-rose-200';
 
                 return `
-                    <tr class="hover:bg-slate-50/80 transition">
-                        <td class="py-3.5 px-4 font-semibold text-slate-800">
-                            ${escapeHtml(item.nama)}
-                        </td>
-                        <td class="py-3.5 px-4 text-slate-600">${escapeHtml(item.tim)}</td>
-                        <td class="py-3.5 px-4 text-xs text-slate-500 whitespace-nowrap">
-                            <i class="fa-regular fa-calendar mr-1"></i>${formatDate(item.tglMulai)} s/d ${formatDate(item.tglSelesai)}
-                        </td>
+                    <tr class="hover:bg-slate-50 transition">
+                        <td class="py-3.5 px-4 font-semibold text-slate-900">${item.nama}</td>
+                        <td class="py-3.5 px-4 text-slate-600">${item.tim}</td>
+                        <td class="py-3.5 px-4 text-xs text-slate-500">${formatDate(item.tglMulai)} s/d ${formatDate(item.tglSelesai)}</td>
                         <td class="py-3.5 px-4">
-                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${badgeClass}">
+                            <span class="px-2.5 py-1 rounded-full text-xs font-semibold border ${badgeClass}">
                                 ${item.status}
                             </span>
                         </td>
                         <td class="py-3.5 px-4">
-                            <div class="flex items-center space-x-2">
+                            <div class="flex items-center gap-2">
                                 <div class="w-full bg-slate-200 rounded-full h-2 overflow-hidden">
-                                    <div class="${barColor} h-2 rounded-full transition-all duration-500" style="width: ${item.progres}%"></div>
+                                    <div class="bg-brand-600 h-2 rounded-full transition-all duration-500" style="width: ${item.progres}%"></div>
                                 </div>
-                                <span class="text-xs font-semibold text-slate-600 w-8 text-right">${item.progres}%</span>
+                                <span class="text-xs font-bold text-slate-700 w-8">${item.progres}%</span>
                             </div>
                         </td>
+                        <td class="py-3.5 px-4">
+                            <span class="inline-flex items-center gap-1 text-xs font-medium ${docCount > 0 ? 'text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-md border border-indigo-200' : 'text-slate-400'}">
+                                <i class="fa-solid fa-paperclip"></i> ${docCount} Berkas
+                            </span>
+                        </td>
                         <td class="py-3.5 px-4 text-center">
-                            <div class="flex items-center justify-center space-x-2">
-                                <button onclick="viewDetail('${item.id}')" title="Detail" class="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition">
-                                    <i class="fa-solid fa-eye"></i>
-                                </button>
-                                <button onclick="editKegiatan('${item.id}')" title="Edit" class="p-1.5 text-amber-600 hover:bg-amber-50 rounded-lg transition">
-                                    <i class="fa-solid fa-pen-to-square"></i>
-                                </button>
-                                <button onclick="deleteKegiatan('${item.id}')" title="Hapus" class="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition">
-                                    <i class="fa-solid fa-trash-can"></i>
-                                </button>
+                            <div class="flex items-center justify-center gap-2">
+                                <button onclick="viewDetail('${item.id}')" title="Detail" class="p-1.5 text-slate-500 hover:text-brand-600 transition"><i class="fa-solid fa-eye"></i></button>
+                                <button onclick="editKegiatan('${item.id}')" title="Edit" class="p-1.5 text-slate-500 hover:text-amber-600 transition"><i class="fa-solid fa-pen-to-square"></i></button>
+                                <button onclick="deleteKegiatan('${item.id}')" title="Hapus" class="p-1.5 text-slate-500 hover:text-rose-600 transition"><i class="fa-solid fa-trash"></i></button>
                             </div>
                         </td>
                     </tr>
@@ -689,62 +647,223 @@
             }).join('');
         }
 
-        // Render Table Dokumen
+        // RENDER TABLE DOKUMEN
         function renderDokumenTable() {
             const tbody = document.getElementById('dokumenTableBody');
-
             if (dokumenData.length === 0) {
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="6" class="py-8 text-center text-slate-400">
-                            <i class="fa-regular fa-file-excel text-3xl mb-2"></i>
-                            <p class="text-sm">Belum ada dokumen yang diupload.</p>
-                        </td>
-                    </tr>
-                `;
+                tbody.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-slate-400 text-sm">Belum ada dokumen yang diunggah</td></tr>`;
                 return;
             }
 
-            tbody.innerHTML = dokumenData.map(doc => {
-                return `
-                    <tr class="hover:bg-slate-50/80 transition">
-                        <td class="py-3.5 px-4 font-medium text-slate-800 flex items-center gap-2">
-                            <i class="fa-solid fa-file-pdf text-red-500 text-base"></i>
-                            <span>${escapeHtml(doc.judul)}</span>
-                        </td>
-                        <td class="py-3.5 px-4 text-xs">
-                            <span class="bg-indigo-50 text-indigo-700 px-2.5 py-1 rounded-md font-medium border border-indigo-100">
-                                ${escapeHtml(doc.kategori)}
-                            </span>
-                        </td>
-                        <td class="py-3.5 px-4 text-xs text-slate-600 max-w-xs truncate">${escapeHtml(doc.kegiatanNama)}</td>
-                        <td class="py-3.5 px-4 text-xs text-slate-500 whitespace-nowrap">${formatDate(doc.tglUpload)}</td>
-                        <td class="py-3.5 px-4 text-xs text-slate-500">${doc.ukuran}</td>
-                        <td class="py-3.5 px-4 text-center">
-                            <div class="flex items-center justify-center space-x-2">
-                                <button onclick="showToast('Simulasi pengunduhan file ${doc.judul}', 'info')" title="Unduh File" class="p-1.5 text-emerald-600 hover:bg-emerald-50 rounded-lg transition">
-                                    <i class="fa-solid fa-download"></i>
-                                </button>
-                                <button onclick="deleteDokumen('${doc.id}')" title="Hapus Dokumen" class="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition">
-                                    <i class="fa-solid fa-trash-can"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                `;
-            }).join('');
+            tbody.innerHTML = dokumenData.map(doc => `
+                <tr class="hover:bg-slate-50 transition">
+                    <td class="py-3.5 px-4 font-semibold text-slate-900 flex items-center gap-2">
+                        <i class="fa-solid fa-file-pdf text-rose-500 text-base"></i>
+                        <span>${doc.judul}</span>
+                    </td>
+                    <td class="py-3.5 px-4">
+                        <span class="px-2 py-0.5 bg-slate-100 text-slate-700 text-xs rounded font-medium border border-slate-200">${doc.kategori}</span>
+                    </td>
+                    <td class="py-3.5 px-4 text-slate-600 text-xs">${doc.kegiatanNama}</td>
+                    <td class="py-3.5 px-4 text-xs text-slate-500">${formatDate(doc.tglUpload)}</td>
+                    <td class="py-3.5 px-4 text-xs text-slate-500">${doc.ukuran}</td>
+                    <td class="py-3.5 px-4 text-center">
+                        <button onclick="deleteDokumen('${doc.id}')" title="Hapus Dokumen" class="p-1.5 text-slate-400 hover:text-rose-600 transition">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
         }
 
-        // Populate Dropdown for Document Upload
-        function populateKegiatanDropdown() {
-            const select = document.getElementById('inputTerkaitKegiatan');
-            select.innerHTML = '<option value="">-- Pilih Kegiatan Terkait --</option>' + 
-                kegiatanData.map(k => `<option value="${k.id}">${escapeHtml(k.nama)}</option>`).join('');
+        // DYNAMIC DOCUMENT ROWS IN FORM
+        function addDocumentRow() {
+            const container = document.getElementById('documentRowsContainer');
+            const newRow = document.createElement('div');
+            newRow.className = 'doc-row border border-slate-200 bg-slate-50/50 p-3 rounded-xl space-y-3 relative';
+            newRow.innerHTML = `
+                <button type="button" onclick="this.closest('.doc-row').remove()" class="absolute top-2 right-2 text-rose-500 hover:text-rose-700 text-xs font-bold p-1">
+                    <i class="fa-solid fa-xmark"></i> Hapus
+                </button>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pr-8">
+                    <div>
+                        <label class="block text-[11px] font-semibold text-slate-600 mb-1">Kategori Dokumen</label>
+                        <select class="doc-kategori w-full px-3 py-1.5 border border-slate-300 rounded-lg text-xs bg-white">
+                            <option value="Laporan Hasil (LHP)">Laporan Hasil (LHP)</option>
+                            <option value="Surat Tugas (SPT)">Surat Tugas (SPT)</option>
+                            <option value="Kertas Kerja (KKP)">Kertas Kerja (KKP)</option>
+                            <option value="Nota Dinas">Nota Dinas</option>
+                            <option value="Dokumen Pendukung">Dokumen Pendukung</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-semibold text-slate-600 mb-1">File Dokumen (PDF, DOCX, XLSX)</label>
+                        <input type="file" class="doc-file w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer">
+                    </div>
+                </div>
+            `;
+            container.appendChild(newRow);
         }
 
-        // Render Chart.js Visualizations
+        // MODAL ACTIONS
+        function openModalKegiatan() {
+            document.getElementById('formKegiatan').reset();
+            document.getElementById('kegiatanId').value = '';
+            document.getElementById('modalKegiatanTitle').innerHTML = `<i class="fa-solid fa-calendar-plus text-brand-500 mr-2"></i> Input Kegiatan & Upload Dokumen`;
+            document.getElementById('documentRowsContainer').innerHTML = `
+                <div class="doc-row border border-slate-200 bg-slate-50/50 p-3 rounded-xl space-y-3 relative">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-[11px] font-semibold text-slate-600 mb-1">Kategori Dokumen</label>
+                            <select class="doc-kategori w-full px-3 py-1.5 border border-slate-300 rounded-lg text-xs bg-white">
+                                <option value="Laporan Hasil (LHP)">Laporan Hasil (LHP)</option>
+                                <option value="Surat Tugas (SPT)">Surat Tugas (SPT)</option>
+                                <option value="Kertas Kerja (KKP)">Kertas Kerja (KKP)</option>
+                                <option value="Nota Dinas">Nota Dinas</option>
+                                <option value="Dokumen Pendukung">Dokumen Pendukung</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-semibold text-slate-600 mb-1">File Dokumen (PDF, DOCX, XLSX)</label>
+                            <input type="file" class="doc-file w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer">
+                        </div>
+                    </div>
+                </div>
+            `;
+            openModal('modalKegiatan');
+        }
+
+        function editKegiatan(id) {
+            const item = kegiatanData.find(k => k.id === id);
+            if (!item) return;
+
+            document.getElementById('kegiatanId').value = item.id;
+            document.getElementById('inputNamaKegiatan').value = item.nama;
+            document.getElementById('inputTim').value = item.tim;
+            document.getElementById('inputTglMulai').value = item.tglMulai;
+            document.getElementById('inputTglSelesai').value = item.tglSelesai;
+            document.getElementById('inputStatus').value = item.status;
+            document.getElementById('inputProgres').value = item.progres;
+            document.getElementById('inputKeterangan').value = item.keterangan || '';
+
+            document.getElementById('modalKegiatanTitle').innerHTML = `<i class="fa-solid fa-pen-to-square text-amber-500 mr-2"></i> Edit Kegiatan & Tambah Dokumen`;
+            openModal('modalKegiatan');
+        }
+
+        function saveKegiatan(e) {
+            e.preventDefault();
+            const id = document.getElementById('kegiatanId').value || Date.now().toString();
+            const nama = document.getElementById('inputNamaKegiatan').value;
+            const tim = document.getElementById('inputTim').value;
+            const tglMulai = document.getElementById('inputTglMulai').value;
+            const tglSelesai = document.getElementById('inputTglSelesai').value;
+            const status = document.getElementById('inputStatus').value;
+            const progres = parseInt(document.getElementById('inputProgres').value) || 0;
+            const keterangan = document.getElementById('inputKeterangan').value;
+
+            const existingIndex = kegiatanData.findIndex(k => k.id === id);
+            const newKegiatanObj = { id, nama, tim, tglMulai, tglSelesai, status, progres, keterangan };
+
+            if (existingIndex > -1) {
+                kegiatanData[existingIndex] = newKegiatanObj;
+            } else {
+                kegiatanData.push(newKegiatanObj);
+            }
+
+            // SIMPAN LAMPIRAN FILE DOKUMEN JIKA ADA
+            const docRows = document.querySelectorAll('.doc-row');
+            let docAdded = false;
+
+            docRows.forEach(row => {
+                const fileInput = row.querySelector('.doc-file');
+                const kategoriSelect = row.querySelector('.doc-kategori');
+
+                if (fileInput && fileInput.files.length > 0) {
+                    const file = fileInput.files[0];
+                    const newDoc = {
+                        id: Date.now().toString() + Math.random().toString(36).substr(2, 4),
+                        judul: file.name,
+                        kegiatanId: id,
+                        kegiatanNama: nama,
+                        kategori: kategoriSelect.value,
+                        tglUpload: new Date().toISOString().split('T')[0],
+                        ukuran: (file.size / (1024 * 1024)).toFixed(2) + ' MB'
+                    };
+                    dokumenData.push(newDoc);
+                    docAdded = true;
+                }
+            });
+
+            saveDataToStorage();
+            renderAll();
+            closeModal('modalKegiatan');
+            showToast(docAdded ? 'Kegiatan & Dokumen berhasil disimpan!' : 'Data kegiatan berhasil disimpan!');
+        }
+
+        function deleteKegiatan(id) {
+            if (confirm('Apakah Anda yakin ingin menghapus kegiatan ini beserta seluruh dokumen terlampir?')) {
+                kegiatanData = kegiatanData.filter(k => k.id !== id);
+                dokumenData = dokumenData.filter(d => d.kegiatanId !== id);
+                saveDataToStorage();
+                renderAll();
+                showToast('Kegiatan berhasil dihapus.');
+            }
+        }
+
+        function deleteDokumen(id) {
+            if (confirm('Apakah Anda yakin ingin menghapus dokumen ini?')) {
+                dokumenData = dokumenData.filter(d => d.id !== id);
+                saveDataToStorage();
+                renderAll();
+                showToast('Dokumen berhasil dihapus.');
+            }
+        }
+
+        function viewDetail(id) {
+            const item = kegiatanData.find(k => k.id === id);
+            if (!item) return;
+
+            const docs = dokumenData.filter(d => d.kegiatanId === id);
+
+            const content = `
+                <div>
+                    <span class="text-xs font-semibold text-brand-600 uppercase tracking-wider">${item.tim}</span>
+                    <h4 class="text-lg font-bold text-slate-900 mt-1">${item.nama}</h4>
+                </div>
+                <div class="grid grid-cols-2 gap-4 bg-slate-50 p-3 rounded-xl border border-slate-200">
+                    <div>
+                        <span class="text-xs text-slate-500">Jadwal:</span>
+                        <p class="text-xs font-semibold text-slate-800">${formatDate(item.tglMulai)} - ${formatDate(item.tglSelesai)}</p>
+                    </div>
+                    <div>
+                        <span class="text-xs text-slate-500">Status / Progres:</span>
+                        <p class="text-xs font-semibold text-slate-800">${item.status} (${item.progres}%)</p>
+                    </div>
+                </div>
+                <div>
+                    <span class="text-xs font-semibold text-slate-700">Catatan/Keterangan:</span>
+                    <p class="text-xs text-slate-600 mt-1 bg-slate-50 p-2.5 rounded-lg border border-slate-200">${item.keterangan || 'Tidak ada catatan.'}</p>
+                </div>
+                <div>
+                    <span class="text-xs font-semibold text-slate-700">Dokumen Terlampir (${docs.length}):</span>
+                    <ul class="mt-2 space-y-1.5">
+                        ${docs.length > 0 ? docs.map(d => `
+                            <li class="text-xs bg-indigo-50/50 border border-indigo-100 p-2 rounded-lg flex justify-between items-center">
+                                <span class="font-medium text-slate-800"><i class="fa-solid fa-file-pdf text-rose-500 mr-1.5"></i> ${d.judul}</span>
+                                <span class="text-[10px] text-indigo-600 font-semibold">${d.kategori}</span>
+                            </li>
+                        `).join('') : '<p class="text-xs text-slate-400 italic">Belum ada dokumen terlampir.</p>'}
+                    </ul>
+                </div>
+            `;
+
+            document.getElementById('detailContent').innerHTML = content;
+            openModal('modalDetail');
+        }
+
+        // CHARTS RENDERING
         function renderCharts() {
-            // Chart 1: Status Donut Chart
+            // Chart Status
             const ctxStatus = document.getElementById('chartStatus').getContext('2d');
             const statusCounts = {
                 'Selesai': kegiatanData.filter(k => k.status === 'Selesai').length,
@@ -758,33 +877,27 @@
             chartStatusInstance = new Chart(ctxStatus, {
                 type: 'doughnut',
                 data: {
-                    labels: ['Selesai', 'Dalam Proses', 'Belum Dimulai', 'Ditunda'],
+                    labels: Object.keys(statusCounts),
                     datasets: [{
-                        data: [statusCounts['Selesai'], statusCounts['Dalam Proses'], statusCounts['Belum Dimulai'], statusCounts['Ditunda']],
-                        backgroundColor: ['#10b981', '#f59e0b', '#64748b', '#ef4444'],
-                        borderWidth: 2,
-                        borderColor: '#ffffff'
+                        data: Object.values(statusCounts),
+                        backgroundColor: ['#10b981', '#f59e0b', '#94a3b8', '#f43f5e']
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: {
-                        legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } }
-                    },
-                    cutout: '68%'
+                    plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } } }
                 }
             });
 
-            // Chart 2: Tim Progress Bar Chart
+            // Chart Tim
             const ctxTim = document.getElementById('chartTim').getContext('2d');
-            const timList = ['Tim Audit I', 'Tim Audit II', 'Tim Evaluasi & Reviu', 'Tim Pengawasan Khusus'];
-            
-            const timProgressAverage = timList.map(tim => {
-                const items = kegiatanData.filter(k => k.tim === tim);
-                if (items.length === 0) return 0;
-                const totalProgres = items.reduce((sum, item) => sum + Number(item.progres), 0);
-                return Math.round(totalProgres / items.length);
+            const teams = ['Tim Audit I', 'Tim Audit II', 'Tim Evaluasi & Reviu', 'Tim Pengawasan Khusus'];
+            const teamProgres = teams.map(t => {
+                const teamItems = kegiatanData.filter(k => k.tim === t);
+                if (teamItems.length === 0) return 0;
+                const sum = teamItems.reduce((acc, curr) => acc + curr.progres, 0);
+                return Math.round(sum / teamItems.length);
             });
 
             if (chartTimInstance) chartTimInstance.destroy();
@@ -792,239 +905,41 @@
             chartTimInstance = new Chart(ctxTim, {
                 type: 'bar',
                 data: {
-                    labels: timList,
+                    labels: teams,
                     datasets: [{
-                        label: 'Rata-Rata Progres (%)',
-                        data: timProgressAverage,
+                        label: 'Progres Rata-rata (%)',
+                        data: teamProgres,
                         backgroundColor: '#0284c7',
-                        borderRadius: 6,
+                        borderRadius: 6
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    scales: {
-                        y: { beginAtZero: true, max: 100, ticks: { callback: value => value + '%' } }
-                    },
-                    plugins: {
-                        legend: { display: false }
-                    }
+                    scales: { y: { beginAtZero: true, max: 100 } },
+                    plugins: { legend: { display: false } }
                 }
             });
         }
 
-        // Form Handlers & Actions
-        function saveKegiatan(e) {
-            e.preventDefault();
-            const id = document.getElementById('kegiatanId').value;
-            const nama = document.getElementById('inputNamaKegiatan').value;
-            const tim = document.getElementById('inputTim').value;
-            const tglMulai = document.getElementById('inputTglMulai').value;
-            const tglSelesai = document.getElementById('inputTglSelesai').value;
-            const status = document.getElementById('inputStatus').value;
-            const progres = Number(document.getElementById('inputProgres').value);
-            const keterangan = document.getElementById('inputKeterangan').value;
+        // UTILITIES
+        function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
 
-            if (id) {
-                // Edit Existing
-                const index = kegiatanData.findIndex(k => k.id === id);
-                if (index !== -1) {
-                    kegiatanData[index] = { id, nama, tim, tglMulai, tglSelesai, status, progres, keterangan };
-                    showToast('Kegiatan berhasil diperbarui!', 'success');
-                }
-            } else {
-                // Add New
-                const newKegiatan = {
-                    id: Date.now().toString(),
-                    nama, tim, tglMulai, tglSelesai, status, progres, keterangan
-                };
-                kegiatanData.push(newKegiatan);
-                showToast('Kegiatan baru berhasil ditambahkan!', 'success');
-            }
-
-            saveData();
-            closeModal('modalKegiatan');
+        function formatDate(dateStr) {
+            if (!dateStr) return '-';
+            const parts = dateStr.split('-');
+            if (parts.length !== 3) return dateStr;
+            return `${parts[2]}/${parts[1]}/${parts[0]}`;
         }
 
-        function editKegiatan(id) {
-            const k = kegiatanData.find(item => item.id === id);
-            if (!k) return;
-
-            document.getElementById('kegiatanId').value = k.id;
-            document.getElementById('inputNamaKegiatan').value = k.nama;
-            document.getElementById('inputTim').value = k.tim;
-            document.getElementById('inputTglMulai').value = k.tglMulai;
-            document.getElementById('inputTglSelesai').value = k.tglSelesai;
-            document.getElementById('inputStatus').value = k.status;
-            document.getElementById('inputProgres').value = k.progres;
-            document.getElementById('inputKeterangan').value = k.keterangan || '';
-
-            document.getElementById('modalKegiatanTitle').innerHTML = '<i class="fa-solid fa-pen-to-square text-amber-500 mr-2"></i> Edit Kegiatan';
-            openModal('modalKegiatan');
-        }
-
-        function deleteKegiatan(id) {
-            if (confirm('Apakah Anda yakin ingin menghapus kegiatan ini?')) {
-                kegiatanData = kegiatanData.filter(k => k.id !== id);
-                showToast('Kegiatan telah dihapus.', 'info');
-                saveData();
-            }
-        }
-
-        function saveDokumen(e) {
-            e.preventDefault();
-            const judul = document.getElementById('inputJudulDokumen').value;
-            const kegiatanId = document.getElementById('inputTerkaitKegiatan').value;
-            const kategori = document.getElementById('inputKategoriDokumen').value;
-            const fileInput = document.getElementById('inputFile');
-
-            const kegiatanObj = kegiatanData.find(k => k.id === kegiatanId);
-            const kegiatanNama = kegiatanObj ? kegiatanObj.nama : 'Kegiatan Umum';
-
-            const fileName = fileInput.files[0] ? fileInput.files[0].name : `${judul}.pdf`;
-            const fileSize = fileInput.files[0] ? (fileInput.files[0].size / (1024 * 1024)).toFixed(1) + ' MB' : '1.2 MB';
-
-            const newDokumen = {
-                id: Date.now().toString(),
-                judul: fileName,
-                kegiatanId,
-                kegiatanNama,
-                kategori,
-                tglUpload: new Date().toISOString().split('T')[0],
-                ukuran: fileSize
-            };
-
-            dokumenData.push(newDokumen);
-            showToast('Dokumen berhasil diunggah!', 'success');
-            saveData();
-            closeModal('modalDokumen');
-        }
-
-        function deleteDokumen(id) {
-            if (confirm('Hapus dokumen ini dari arsip?')) {
-                dokumenData = dokumenData.filter(d => d.id !== id);
-                showToast('Dokumen berhasil dihapus.', 'info');
-                saveData();
-            }
-        }
-
-        function viewDetail(id) {
-            const k = kegiatanData.find(item => item.id === id);
-            if (!k) return;
-
-            const relatedDocs = dokumenData.filter(d => d.kegiatanId === id);
-
-            document.getElementById('detailContent').innerHTML = `
-                <div class="space-y-3">
-                    <div>
-                        <span class="text-xs font-bold uppercase text-slate-400">Nama Kegiatan</span>
-                        <h4 class="text-base font-bold text-slate-800">${escapeHtml(k.nama)}</h4>
-                    </div>
-                    <div class="grid grid-cols-2 gap-2 text-xs">
-                        <div>
-                            <span class="text-slate-400 font-semibold block">Tim Pelaksana</span>
-                            <span class="text-slate-700 font-medium">${escapeHtml(k.tim)}</span>
-                        </div>
-                        <div>
-                            <span class="text-slate-400 font-semibold block">Status</span>
-                            <span class="font-semibold">${k.status} (${k.progres}%)</span>
-                        </div>
-                    </div>
-                    <div class="text-xs">
-                        <span class="text-slate-400 font-semibold block">Jadwal</span>
-                        <span class="text-slate-700">${formatDate(k.tglMulai)} s/d ${formatDate(k.tglSelesai)}</span>
-                    </div>
-                    <div class="text-xs bg-slate-50 p-3 rounded-lg border">
-                        <span class="text-slate-400 font-semibold block mb-1">Catatan / Keterangan</span>
-                        <p class="text-slate-700">${escapeHtml(k.keterangan || 'Tidak ada catatan tambahan.')}</p>
-                    </div>
-                    <div class="text-xs pt-2">
-                        <span class="text-slate-500 font-semibold block mb-2">Dokumen Terkait (${relatedDocs.length})</span>
-                        ${relatedDocs.length > 0 ? 
-                            `<ul class="space-y-1">${relatedDocs.map(d => `<li class="text-brand-600 flex items-center gap-1"><i class="fa-solid fa-file-pdf text-red-500"></i> ${escapeHtml(d.judul)}</li>`).join('')}</ul>` :
-                            '<p class="text-slate-400 italic">Belum ada dokumen yang diunggah untuk kegiatan ini.</p>'
-                        }
-                    </div>
-                </div>
-            `;
-            openModal('modalDetail');
-        }
-
-        // Helper UI Functions
-        function openModal(id) {
-            if (id === 'modalKegiatan' && !document.getElementById('kegiatanId').value) {
-                document.getElementById('formKegiatan').reset();
-                document.getElementById('modalKegiatanTitle').innerHTML = '<i class="fa-solid fa-calendar-plus text-brand-500 mr-2"></i> Input Kegiatan Baru';
-            }
-            if (id === 'modalDokumen') {
-                document.getElementById('formDokumen').reset();
-                document.getElementById('fileNameDisplay').innerText = 'Belum ada file dipilih';
-            }
-            document.getElementById(id).classList.remove('hidden');
-        }
-
-        function closeModal(id) {
-            document.getElementById(id).classList.add('hidden');
-            if (id === 'modalKegiatan') document.getElementById('kegiatanId').value = '';
-        }
-
-        function updateFileName(input) {
-            const display = document.getElementById('fileNameDisplay');
-            if (input.files && input.files[0]) {
-                display.innerText = 'File dipilih: ' + input.files[0].name;
-            } else {
-                display.innerText = 'Belum ada file dipilih';
-            }
-        }
-
-        function showToast(msg, type = 'success') {
+        function showToast(msg) {
             const toast = document.getElementById('toast');
-            const toastMsg = document.getElementById('toastMessage');
-            const toastIcon = document.getElementById('toastIcon');
-
-            toastMsg.innerText = msg;
-            if (type === 'success') {
-                toastIcon.className = 'fa-solid fa-circle-check text-emerald-400 text-lg';
-            } else if (type === 'info') {
-                toastIcon.className = 'fa-solid fa-circle-info text-blue-400 text-lg';
-            }
-
+            document.getElementById('toastMessage').innerText = msg;
             toast.classList.remove('translate-y-20', 'opacity-0');
             setTimeout(() => {
                 toast.classList.add('translate-y-20', 'opacity-0');
             }, 3000);
-        }
-
-        function getStatusBadge(status) {
-            switch(status) {
-                case 'Selesai': return 'bg-emerald-100 text-emerald-800 border border-emerald-200';
-                case 'Dalam Proses': return 'bg-amber-100 text-amber-800 border border-amber-200';
-                case 'Belum Dimulai': return 'bg-slate-100 text-slate-700 border border-slate-200';
-                case 'Ditunda': return 'bg-red-100 text-red-800 border border-red-200';
-                default: return 'bg-slate-100 text-slate-700';
-            }
-        }
-
-        function getProgresBarColor(progres) {
-            if (progres >= 100) return 'bg-emerald-500';
-            if (progres >= 50) return 'bg-brand-500';
-            if (progres > 0) return 'bg-amber-500';
-            return 'bg-slate-300';
-        }
-
-        function formatDate(dateStr) {
-            if (!dateStr) return '-';
-            const options = { day: 'numeric', month: 'short', year: 'numeric' };
-            return new Date(dateStr).toLocaleDateString('id-ID', options);
-        }
-
-        function escapeHtml(text) {
-            if (!text) return '';
-            return text.replace(/&/g, "&amp;")
-                       .replace(/</g, "&lt;")
-                       .replace(/>/g, "&gt;")
-                       .replace(/"/g, "&quot;")
-                       .replace(/'/g, "&#039;");
         }
     </script>
 </body>
